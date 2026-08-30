@@ -17,6 +17,7 @@ jobs:
   verify:
     name: Python, contracts, and x86-64 runtime
     runs-on: ubuntu-24.04
+    container: python:3.12-slim-trixie
     timeout-minutes: 50
 
     steps:
@@ -41,15 +42,14 @@ jobs:
 
       - name: Install native contract dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends \
-            libgirepository1.0-dev libwireplumber-0.5-dev pipewire pipewire-bin
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates curl gcc git pkg-config \
+            libpipewire-0.3-dev libwireplumber-0.5-dev \
+            pipewire pipewire-bin
 
-      - name: Set up Python and uv
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - uses: astral-sh/setup-uv@v4
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v4
 
       - name: Set up pinned Rust
         uses: dtolnay/rust-toolchain@master
@@ -109,13 +109,16 @@ jobs:
   arm64-build:
     name: ARM64 runtime and wheel
     runs-on: ubuntu-24.04-arm
+    container: python:3.12-slim-trixie
     timeout-minutes: 50
 
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates curl gcc git pkg-config
       - uses: astral-sh/setup-uv@v4
       - uses: dtolnay/rust-toolchain@master
         with:

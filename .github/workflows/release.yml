@@ -27,15 +27,18 @@ jobs:
           - runner: ubuntu-24.04-arm
             architecture: aarch64
     runs-on: ${{ matrix.runner }}
+    container: python:3.12-slim-trixie
     timeout-minutes: 50
 
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: Install build dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates curl gcc git pkg-config
       - uses: astral-sh/setup-uv@v4
       - uses: dtolnay/rust-toolchain@master
         with:
@@ -108,6 +111,7 @@ jobs:
           - runner: ubuntu-24.04-arm
             architecture: aarch64
     runs-on: ${{ matrix.runner }}
+    container: python:3.12-slim-trixie
     timeout-minutes: 20
     steps:
       - name: Check out plugin release source
@@ -118,14 +122,14 @@ jobs:
           repository: k3rnL/open-cinema
           ref: ${{ env.OPEN_CINEMA_CONTRACT_REF }}
           path: open-cinema
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       - uses: astral-sh/setup-uv@v4
       - name: Install native contract dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends libwireplumber-0.5-dev
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates git gh \
+            libpipewire-0.3-0 libwireplumber-0.5-0 \
+            pipewire pipewire-bin wireplumber
       - name: Download published draft assets
         env:
           GH_TOKEN: ${{ github.token }}
