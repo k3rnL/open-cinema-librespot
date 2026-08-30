@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.8 - 2026-08-30
+
+- Initialize the Django host before importing SDK-backed plugin storage in the
+  clean release verifier.
+- Run release verification outside the source checkout so it proves the
+  installed wheel and architecture-specific packaged assets.
+
 ## 0.1.7 - 2026-08-30
 
 - Complete the clean release-smoke host fixture with the host's public runtime

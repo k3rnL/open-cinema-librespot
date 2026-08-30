@@ -5,22 +5,15 @@ import argparse
 import hashlib
 import importlib.metadata
 import json
+import os
 import subprocess
 import tomllib
 from importlib import resources
 from pathlib import Path
 from typing import Any
 
-from open_cinema_plugin_sdk import (
-    SDK_CONTRACT_VERSION,
-    validate_built_wheel,
-    validate_runtime_plugin,
-)
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
-
-from open_cinema_librespot.plugin import LibrespotPlugin
-from open_cinema_librespot.runtime_assets import load_runtime_assets
 
 
 def sha256(path: Path) -> str:
@@ -59,6 +52,19 @@ def verify_release(
     provenance_path: Path,
     tag: str,
 ) -> dict[str, object]:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "opencinema.settings")
+    import django
+
+    django.setup()
+    from open_cinema_plugin_sdk import (
+        SDK_CONTRACT_VERSION,
+        validate_built_wheel,
+        validate_runtime_plugin,
+    )
+
+    from open_cinema_librespot.plugin import LibrespotPlugin
+    from open_cinema_librespot.runtime_assets import load_runtime_assets
+
     expected_version = tag.removeprefix("v")
     if not expected_version or tag != f"v{expected_version}":
         raise AssertionError("release tag must use the v<version> form")

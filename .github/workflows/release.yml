@@ -177,10 +177,14 @@ jobs:
             'gunicorn==23.0.0' \
             'jsonschema>=4.25' \
             'packaging>=24.0'
-          .release-smoke/bin/python scripts/verify_release_install.py \
-            --wheel downloaded/*linux_${ARCHITECTURE}.whl \
-            --checksum "downloaded/checksums-${ARCHITECTURE}.sha256" \
-            --provenance "downloaded/provenance-${ARCHITECTURE}.json" \
+          workspace="$PWD"
+          wheel="$(printf '%s\n' "$workspace"/downloaded/*linux_${ARCHITECTURE}.whl)"
+          cd /tmp
+          "$workspace/.release-smoke/bin/python" \
+            "$workspace/scripts/verify_release_install.py" \
+            --wheel "$wheel" \
+            --checksum "$workspace/downloaded/checksums-${ARCHITECTURE}.sha256" \
+            --provenance "$workspace/downloaded/provenance-${ARCHITECTURE}.json" \
             --tag "$GITHUB_REF_NAME"
 
   finalize:
