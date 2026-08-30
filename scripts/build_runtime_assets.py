@@ -6,14 +6,20 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
 
-from open_cinema_librespot.version import __version__
-
 ROOT = Path(__file__).resolve().parent.parent
+VERSION_MATCH = re.search(
+    r'__version__ = "([^"]+)"',
+    (ROOT / "open_cinema_librespot" / "version.py").read_text(encoding="utf-8"),
+)
+if VERSION_MATCH is None:
+    raise RuntimeError("plugin version could not be read")
+PLUGIN_VERSION = VERSION_MATCH.group(1)
 PIN = json.loads((ROOT / "runtime-assets" / "librespot-v0.8.0.json").read_text())
 ARCHITECTURES = {"amd64": "x86_64", "x86_64": "x86_64", "arm64": "aarch64", "aarch64": "aarch64"}
 TARGETS = {
@@ -131,7 +137,7 @@ def main() -> int:
     version_output = run(str(output / "librespot"), "--version", capture=True).strip()
     identity = {
         "schemaVersion": 1,
-        "pluginVersion": __version__,
+        "pluginVersion": PLUGIN_VERSION,
         "librespotVersion": "0.8.0",
         "librespotSourceCommit": PIN["commit"],
         "sourceDateEpoch": PIN["sourceDateEpoch"],

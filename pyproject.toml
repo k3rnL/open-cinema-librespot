@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open-cinema-librespot"
-version = "0.1.1"
+version = "0.1.2"
 description = "Managed Spotify Connect audio sources for Open Cinema"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"

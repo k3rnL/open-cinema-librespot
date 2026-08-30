@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.2 - 2026-08-30
+
+- Correct the source-tree version lookup used by dependency-free ARM64 asset builds.
+
 ## 0.1.1 - 2026-08-30
 
 - Corrective first publication after the `0.1.0` tag stopped before artifact creation.
