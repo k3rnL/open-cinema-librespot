@@ -1,0 +1,93 @@
+[build-system]
+requires = ["setuptools>=77.0", "wheel>=0.45"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "open-cinema-librespot"
+version = "0.1.0"
+description = "Managed Spotify Connect audio sources for Open Cinema"
+readme = "README.md"
+requires-python = ">=3.12,<3.14"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{name = "Erwan Daniel"}]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: End Users/Desktop",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Sound/Audio",
+]
+dependencies = ["jsonschema>=4.25", "open-cinema>=0.3.3,<0.4"]
+
+[project.urls]
+Homepage = "https://github.com/k3rnL/open-cinema-librespot"
+Documentation = "https://github.com/k3rnL/open-cinema-librespot#readme"
+Repository = "https://github.com/k3rnL/open-cinema-librespot"
+Issues = "https://github.com/k3rnL/open-cinema-librespot/issues"
+
+[project.entry-points."open_cinema.plugins"]
+"open-cinema.librespot" = "open_cinema_librespot.plugin:LibrespotPlugin"
+
+[project.scripts]
+open-cinema-librespot-event-relay = "open_cinema_librespot.events:relay_main"
+
+[dependency-groups]
+dev = [
+  "build>=1.2.2",
+  "mypy>=1.15",
+  "pytest>=8.3",
+  "pytest-cov>=6.0",
+  "pytest-django>=4.11",
+  "ruff>=0.11",
+  "twine>=6.1",
+  "types-jsonschema>=4.25",
+]
+
+[tool.uv.sources]
+open-cinema = {path = "../open-cinema", editable = true}
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["open_cinema_librespot*"]
+
+[tool.setuptools.package-data]
+open_cinema_librespot = [
+  "open-cinema-plugin.toml",
+  "py.typed",
+  "schemas/*.json",
+  "runtime_assets/*.json",
+  "runtime_assets/bin/*/*",
+]
+
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "opencinema.settings"
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = ["pipewire_integration: requires an explicitly selected live PipeWire server"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["open_cinema_librespot"]
+ignore_missing_imports = true
+disallow_untyped_decorators = false
+
+[[tool.mypy.overrides]]
+module = "open_cinema_librespot.plugin"
+disable_error_code = ["misc", "no-any-return"]
+
+[[tool.mypy.overrides]]
+module = ["api.*", "core.*", "open_cinema_plugin_sdk.*"]
+follow_imports = "skip"
+ignore_errors = true

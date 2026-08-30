@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-cinema.local/plugins/librespot/plugin-settings-v1.json",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mediaRoots": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 1024}
+    },
+    "maximumInstances": {"type": "integer", "minimum": 1, "maximum": 16, "default": 4},
+    "maximumCacheBytesPerInstance": {
+      "type": "integer",
+      "minimum": 16777216,
+      "maximum": 107374182400,
+      "default": 2147483648
+    }
+  },
+  "required": ["mediaRoots", "maximumInstances", "maximumCacheBytesPerInstance"]
+}

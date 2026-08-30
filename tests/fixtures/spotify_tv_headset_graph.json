@@ -1,0 +1,102 @@
+{
+  "fixtureVersion": "open-cinema.librespot.acceptance/v1",
+  "librespotInstanceId": "11111111-1111-1111-1111-111111111111",
+  "logicalEndpoints": [
+    {"id": "2c284dd8-b85e-5f7d-bd07-56a96e0b9ba9", "direction": "input", "name": "Spotify living room"},
+    {"id": "endpoint:tv", "direction": "input", "name": "TV"},
+    {"id": "endpoint:main-speakers", "direction": "output", "name": "Main speakers"},
+    {"id": "endpoint:headset", "direction": "output", "name": "Headset"}
+  ],
+  "graph": {
+    "schemaVersion": 1,
+    "id": "graph:spotify-tv-headset-example",
+    "kind": "graph",
+    "metadata": {
+      "name": "Spotify or TV to headset or main speakers",
+      "description": "Active Spotify takes input priority over TV; a connected headset takes output priority over the main speakers.",
+      "labels": {"fixture": "open-cinema-librespot"}
+    },
+    "parameters": [],
+    "publicPorts": [],
+    "conditions": [],
+    "nodes": [
+      {
+        "id": "node:input-selector",
+        "type": "core.ordered-selector",
+        "version": 1,
+        "configuration": {
+          "mode": "exclusive",
+          "candidates": [
+            {
+              "endpoint": "2c284dd8-b85e-5f7d-bd07-56a96e0b9ba9",
+              "priority": 200,
+              "eligibleWhen": {
+                "op": "all",
+                "args": [
+                  {"op": "eq", "fact": "endpoint.2c284dd8-b85e-5f7d-bd07-56a96e0b9ba9.availability", "value": "route-available"},
+                  {"op": "eq", "fact": "endpoint.2c284dd8-b85e-5f7d-bd07-56a96e0b9ba9.activeSignal", "value": true}
+                ]
+              },
+              "unknownResult": "ineligible"
+            },
+            {
+              "endpoint": "endpoint:tv",
+              "priority": 100,
+              "eligibleWhen": {"op": "exists", "fact": "endpoint.endpoint:tv.availability"},
+              "unknownResult": "waiting"
+            }
+          ]
+        },
+        "layout": {"x": 0, "y": 0}
+      },
+      {
+        "id": "node:adaptive-decoder",
+        "type": "processor.pcm-auto-decoder",
+        "version": 1,
+        "configuration": {
+          "pcmBehavior": "bypass",
+          "encodedBehavior": "decode",
+          "unsupportedBehavior": "error",
+          "minimumConfidence": 0.9
+        },
+        "layout": {"x": 300, "y": 0}
+      },
+      {
+        "id": "node:camilladsp",
+        "type": "processor.camilladsp-profile-selector",
+        "version": 1,
+        "configuration": {"profiles": []},
+        "layout": {"x": 600, "y": 0}
+      },
+      {
+        "id": "node:output-selector",
+        "type": "core.ordered-selector",
+        "version": 1,
+        "configuration": {
+          "mode": "exclusive",
+          "candidates": [
+            {
+              "endpoint": "endpoint:headset",
+              "priority": 200,
+              "eligibleWhen": {"op": "eq", "fact": "endpoint.endpoint:headset.availability", "value": "route-available"},
+              "unknownResult": "ineligible"
+            },
+            {
+              "endpoint": "endpoint:main-speakers",
+              "priority": 100,
+              "eligibleWhen": {"op": "eq", "fact": "endpoint.endpoint:main-speakers.availability", "value": "route-available"},
+              "unknownResult": "waiting"
+            }
+          ]
+        },
+        "layout": {"x": 900, "y": 0}
+      }
+    ],
+    "edges": [
+      {"id": "edge:input-decoder", "from": {"node": "node:input-selector", "port": "audio"}, "to": {"node": "node:adaptive-decoder", "port": "input"}},
+      {"id": "edge:decoder-dsp", "from": {"node": "node:adaptive-decoder", "port": "output"}, "to": {"node": "node:camilladsp", "port": "input"}},
+      {"id": "edge:dsp-output", "from": {"node": "node:camilladsp", "port": "output"}, "to": {"node": "node:output-selector", "port": "input"}}
+    ],
+    "layout": {"viewport": {"x": 0, "y": 0, "zoom": 1.0}}
+  }
+}

@@ -1,0 +1,129 @@
+name: CI
+
+on:
+  workflow_call:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: open-cinema-librespot-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Python, contracts, and x86-64 runtime
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+
+    steps:
+      - name: Check out plugin
+        uses: actions/checkout@v4
+        with:
+          path: open-cinema-librespot
+
+      - name: Check out Open Cinema contract host
+        uses: actions/checkout@v4
+        with:
+          repository: k3rnL/open-cinema
+          ref: d8decefd6ffe0c3c1b9159f8430afd44ee8539cc
+          path: open-cinema
+
+      - name: Check out accepted WyrePlumber binding
+        uses: actions/checkout@v4
+        with:
+          repository: k3rnL/wyreplumber
+          ref: v0.2.0
+          path: wyreplumber
+
+      - name: Install native contract dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libgirepository1.0-dev libwireplumber-0.5-dev pipewire pipewire-bin
+
+      - name: Set up Python and uv
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v4
+
+      - name: Set up pinned Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.85.0
+
+      - name: Install locked dependencies
+        working-directory: open-cinema-librespot
+        run: uv sync --frozen --all-groups
+
+      - name: Run static, unit, SDK, and manifest gates
+        working-directory: open-cinema-librespot
+        run: |
+          uv run ruff format --check open_cinema_librespot tests scripts
+          uv run ruff check open_cinema_librespot tests scripts
+          uv run mypy open_cinema_librespot
+          uv run pytest -q
+          uv run python - <<'PY'
+          from open_cinema_plugin_sdk import validate_source_checkout
+          report = validate_source_checkout('.')
+          assert report.valid, report.to_document()
+          PY
+
+      - name: Build and verify pinned x86-64 runtime assets
+        working-directory: open-cinema-librespot
+        run: |
+          uv run python scripts/build_runtime_assets.py --architecture x86_64
+          uv run python scripts/audit_options.py \
+            --help-output open_cinema_librespot/runtime_assets/bin/x86_64/librespot-help.txt
+          cargo +1.85.0 fmt --manifest-path runtime-assets/oauth-helper/Cargo.toml --check
+          cargo +1.85.0 clippy \
+            --manifest-path runtime-assets/oauth-helper/Cargo.toml \
+            --locked --all-targets -- -D warnings
+          cargo +1.85.0 test --manifest-path runtime-assets/oauth-helper/Cargo.toml --locked
+
+      - name: Prove the real PipeWire stream contract
+        working-directory: open-cinema-librespot
+        run: |
+          export XDG_RUNTIME_DIR="$RUNNER_TEMP/open-cinema-pipewire"
+          install -d -m 700 "$XDG_RUNTIME_DIR"
+          pipewire >"$RUNNER_TEMP/pipewire.log" 2>&1 &
+          pipewire_pid=$!
+          trap 'kill "$pipewire_pid" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 50); do
+            pw-dump >/dev/null 2>&1 && break
+            sleep 0.1
+          done
+          OPEN_CINEMA_PIPEWIRE_INTEGRATION=1 uv run pytest -q tests/test_pipewire_integration.py
+
+      - name: Build and inspect platform wheel
+        working-directory: open-cinema-librespot
+        run: |
+          uv run python -m build --wheel
+          uv run python scripts/verify_wheel.py dist/*.whl
+          uv run twine check dist/*
+
+  arm64-build:
+    name: ARM64 runtime and wheel
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 50
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.85.0
+      - name: Build pinned ARM64 assets without installing the host application
+        run: |
+          uv venv
+          uv pip install --python .venv/bin/python build setuptools wheel
+          .venv/bin/python scripts/build_runtime_assets.py --architecture aarch64
+          .venv/bin/python -m build --wheel --no-isolation
+          .venv/bin/python scripts/verify_wheel.py dist/*.whl

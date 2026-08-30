@@ -1,0 +1,16 @@
+{
+  "architecture": "x86_64",
+  "features": [
+    "rustls-tls-webpki-roots",
+    "with-libmdns"
+  ],
+  "librespotSha256": "3b150a07b173c8d1dfa265bb6fb7735b6c1aea59deb9f8a3f66933fec861cac2",
+  "librespotSourceCommit": "d36f9f1907e8cc9d68a93f8ebc6b627b1bf7267d",
+  "librespotVersion": "0.8.0",
+  "librespotVersionOutput": "librespot 0.8.0 d36f9f1 (Built on 2025-11-10, Build ID: 1762793321, Profile: release)",
+  "oauthHelperSha256": "449fa4db60edcbc0e34b99e8cab1ef04fae956f328cf54da297c9c09daee87a4",
+  "pluginVersion": "0.1.0",
+  "schemaVersion": 1,
+  "sourceDateEpoch": 1762793321,
+  "target": "x86_64-unknown-linux-gnu"
+}

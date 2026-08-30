@@ -1,0 +1,183 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+
+env:
+  OPEN_CINEMA_CONTRACT_REF: d8decefd6ffe0c3c1b9159f8430afd44ee8539cc
+
+jobs:
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  build:
+    name: Build ${{ matrix.architecture }} wheel
+    needs: verify
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: x86_64
+          - runner: ubuntu-24.04-arm
+            architecture: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 50
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.85.0
+
+      - name: Verify tag and build immutable wheel
+        env:
+          ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          git diff --exit-code
+          git diff --cached --exit-code
+          test "$(git rev-list -n 1 "$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          version="$(python -c 'from pathlib import Path; import re; print(re.search(r"__version__ = \"([^\"]+)", Path("open_cinema_librespot/version.py").read_text()).group(1))')"
+          test "v$version" = "$GITHUB_REF_NAME"
+          uv venv
+          uv pip install --python .venv/bin/python build setuptools wheel
+          .venv/bin/python scripts/build_runtime_assets.py --architecture "$ARCHITECTURE"
+          .venv/bin/python -m build --wheel --no-isolation
+          .venv/bin/python scripts/verify_wheel.py dist/*.whl
+          (cd dist && sha256sum *.whl > "checksums-$ARCHITECTURE.sha256")
+          .venv/bin/python scripts/build_release_provenance.py \
+            --architecture "$ARCHITECTURE" \
+            --repository "$GITHUB_REPOSITORY" \
+            --commit "$GITHUB_SHA" \
+            --tag "$GITHUB_REF_NAME" \
+            --workflow-run "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --output "dist/provenance-$ARCHITECTURE.json"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.architecture }}
+          path: |
+            dist/*.whl
+            dist/*.sha256
+            dist/provenance-*.json
+
+  publish:
+    name: Publish immutable GitHub release
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: release
+          merge-multiple: true
+      - name: Verify downloaded artifacts
+        run: |
+          cd release
+          for checksum in checksums-*.sha256; do sha256sum --check "$checksum"; done
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: |
+            release/*.whl
+            release/*.sha256
+            release/*provenance.json
+
+  smoke-release:
+    name: Smoke downloaded ${{ matrix.architecture }} release
+    needs: publish
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            architecture: x86_64
+          - runner: ubuntu-24.04-arm
+            architecture: aarch64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 20
+    steps:
+      - name: Check out plugin release source
+        uses: actions/checkout@v4
+      - name: Check out pinned Open Cinema contract host
+        uses: actions/checkout@v4
+        with:
+          repository: k3rnL/open-cinema
+          ref: ${{ env.OPEN_CINEMA_CONTRACT_REF }}
+          path: open-cinema
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v4
+      - name: Install native contract dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libwireplumber-0.5-dev
+      - name: Download published draft assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          mkdir downloaded
+          gh release download "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --pattern "*linux_${ARCHITECTURE}.whl" \
+            --pattern "checksums-${ARCHITECTURE}.sha256" \
+            --pattern "provenance-${ARCHITECTURE}.json" \
+            --dir downloaded
+          (cd downloaded && sha256sum --check "checksums-${ARCHITECTURE}.sha256")
+          mkdir wyreplumber-release
+          gh release download v0.2.0 \
+            --repo k3rnL/wyreplumber \
+            --pattern "wyreplumber-0.2.0-cp312-cp312-linux_${ARCHITECTURE}.whl" \
+            --pattern "wyreplumber-0.2.0-cp312-cp312-linux_${ARCHITECTURE}.whl.sha256" \
+            --dir wyreplumber-release
+          (cd wyreplumber-release && sha256sum --check *.whl.sha256)
+      - name: Install clean host and release wheel
+        env:
+          ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          uv venv .release-smoke
+          uv pip install --python .release-smoke/bin/python build setuptools wheel
+          .release-smoke/bin/python -m build \
+            --wheel --no-isolation --outdir host-dist open-cinema
+          uv pip install --python .release-smoke/bin/python --no-deps \
+            host-dist/open_cinema-*.whl \
+            downloaded/*linux_${ARCHITECTURE}.whl
+          uv pip install --python .release-smoke/bin/python \
+            wyreplumber-release/*.whl \
+            'Django>=6.0' \
+            'jsonschema>=4.25' \
+            'packaging>=24.0'
+          .release-smoke/bin/python scripts/verify_release_install.py \
+            --wheel downloaded/*linux_${ARCHITECTURE}.whl \
+            --checksum "downloaded/checksums-${ARCHITECTURE}.sha256" \
+            --provenance "downloaded/provenance-${ARCHITECTURE}.json" \
+            --tag "$GITHUB_REF_NAME"
+
+  finalize:
+    name: Publish verified release
+    needs: smoke-release
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Make verified release public
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release edit "$GITHUB_REF_NAME" \
+            --repo "$GITHUB_REPOSITORY" \
+            --draft=false \
+            --latest

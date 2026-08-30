@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "librespotVersion": "0.8.0",
+  "sourceCommit": "d36f9f1907e8cc9d68a93f8ebc6b627b1bf7267d",
+  "rustToolchain": "1.85.0",
+  "features": ["rustls-tls-webpki-roots", "with-libmdns"],
+  "audioBackend": "pipe",
+  "zeroconfBackends": ["libmdns"],
+  "targets": ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"],
+  "signal": {
+    "mediaType": "audio",
+    "content": "pcm",
+    "format": "F32LE",
+    "rate": 44100,
+    "channels": 2,
+    "positions": ["FL", "FR"]
+  },
+  "optionMapVersion": 1
+}
+

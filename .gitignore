@@ -1,0 +1,16 @@
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.idea/
+__pycache__/
+*.py[cod]
+build/
+dist/
+*.egg-info/
+coverage.xml
+.coverage
+runtime-assets/build/
+runtime-assets/oauth-helper/target/
+open_cinema_librespot/runtime_assets/bin/*/librespot
+open_cinema_librespot/runtime_assets/bin/*/open-cinema-librespot-oauth

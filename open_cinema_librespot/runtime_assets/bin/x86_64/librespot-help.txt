@@ -1,0 +1,127 @@
+librespot 0.8.0 d36f9f1 (Built on 2025-11-10, Build ID: 1762793321, Profile: release)
+
+An open source client library for Spotify, with support for Spotify Connect
+
+https://github.com/librespot-org/librespot
+
+Usage: /home/edaniel/PyCharmProjects/open-cinema-librespot/open_cinema_librespot/runtime_assets/bin/x86_64/librespot [<Options>]
+
+Options:
+    -h, --help          Print this help menu.
+    -V, --version       Display librespot version string.
+    -v, --verbose       Enable verbose log output.
+    -q, --quiet         Only log warning and error messages.
+    -G, --disable-audio-cache 
+                        Disable caching of the audio data.
+    -H, --disable-credential-cache 
+                        Disable caching of credentials.
+    -O, --disable-discovery 
+                        Disable zeroconf discovery mode.
+    -g, --disable-gapless 
+                        Disable gapless playback.
+    -Q, --emit-sink-events 
+                        Run PROGRAM set by `--onevent` before the sink is
+                        opened and after it is closed.
+    -N, --enable-volume-normalisation 
+                        Play all tracks at approximately the same apparent
+                        volume.
+    -j, --enable-oauth  Perform interactive OAuth sign in.
+    -n, --name NAME     Device name. Defaults to Librespot.
+    -b, --bitrate BITRATE
+                        Bitrate (kbps) {96|160|320}. Defaults to 160.
+    -f, --format FORMAT Output format {F64|F32|S32|S24|S24_3|S16}. Defaults to
+                        S16.
+    -D, --dither DITHER Specify the dither algorithm to use
+                        {none|gpdf|tpdf|tpdf_hp}. Defaults to tpdf for formats
+                        S16, S24, S24_3 and none for other formats.
+    -F, --device-type TYPE
+                        Displayed device type. Defaults to speaker.
+        --group         Whether the device represents a group. Defaults to
+                        false.
+    -t, --tmp PATH      Path to a directory where files will be temporarily
+                        stored while downloading.
+    -c, --cache PATH    Path to a directory where files will be cached after
+                        downloading.
+    -C, --system-cache PATH
+                        Path to a directory where system files (credentials,
+                        volume) will be cached. May be different from the
+                        `--cache` option value.
+    -M, --cache-size-limit SIZE
+                        Limits the size of the cache for audio files. It's
+                        possible to use suffixes like K, M or G, e.g. 16G for
+                        example.
+    -B, --backend NAME  Audio backend to use. Use ? to list options.
+    -u, --username USERNAME
+                        Username used to sign in with.
+    -p, --password PASSWORD
+                        Password used to sign in with.
+    -k, --access-token TOKEN
+                        Spotify access token to sign in with.
+    -K, --oauth-port PORT
+                        The port the oauth redirect server uses 1 - 65535.
+                        Ports <= 1024 may require root privileges.
+    -o, --onevent PROGRAM
+                        Run PROGRAM when a playback event occurs.
+    -T, --alsa-mixer-control NAME
+                        Not supported by the included audio backend(s).
+    -S, --alsa-mixer-device DEVICE
+                        Not supported by the included audio backend(s).
+    -s, --alsa-mixer-index NUMBER
+                        Not supported by the included audio backend(s).
+    -m, --mixer MIXER   Not supported by the included audio backend(s).
+    -d, --device NAME   Not supported by the included audio backend(s).
+    -R, --initial-volume VOLUME
+                        Initial volume in % from 0 - 100. Defaults to 50.
+    -E, --volume-ctrl VOLUME_CTRL
+                        Volume control scale type {cubic|fixed|linear|log}.
+                        Defaults to log.
+    -e, --volume-range RANGE
+                        Range of the volume control (dB) from 0.0 to 100.0.
+                        Defaults to 60.0.
+        --volume-steps STEPS
+                        Number of incremental steps when responding to volume
+                        control updates. Defaults to 64.
+    -X, --normalisation-method METHOD
+                        Specify the normalisation method to use
+                        {basic|dynamic}. Defaults to dynamic.
+    -W, --normalisation-gain-type TYPE
+                        Specify the normalisation gain type to use
+                        {track|album|auto}. Defaults to auto.
+    -Y, --normalisation-pregain PREGAIN
+                        Pregain (dB) applied by volume normalisation from
+                        -10.0 to 10.0. Defaults to 0.0.
+    -Z, --normalisation-threshold THRESHOLD
+                        Threshold (dBFS) at which point the dynamic limiter
+                        engages to prevent clipping from 0.0 to -10.0.
+                        Defaults to -2.0.
+    -U, --normalisation-attack TIME
+                        Attack time (ms) in which the dynamic limiter reduces
+                        gain from 1 to 500. Defaults to 5.
+    -y, --normalisation-release TIME
+                        Release or decay time (ms) in which the dynamic
+                        limiter restores gain from 1 to 1000. Defaults to 100.
+    -w, --normalisation-knee KNEE
+                        Knee width (dB) of the dynamic limiter from 0.0 to
+                        10.0. Defaults to 5.0.
+    -z, --zeroconf-port PORT
+                        The port the internal server advertises over zeroconf
+                        1 - 65535. Ports <= 1024 may require root privileges.
+    -x, --proxy URL     HTTP proxy to use when connecting.
+    -a, --ap-port PORT  Connect to an AP with a specified port 1 - 65535.
+                        Available ports are usually 80, 443 and 4070.
+    -A, --autoplay OVERRIDE
+                        Explicitly set autoplay {on|off}. Defaults to
+                        following the client setting.
+    -i, --zeroconf-interface IP
+                        Comma-separated interface IP addresses on which
+                        zeroconf will bind. Defaults to all interfaces.
+                        Ignored by DNS-SD.
+        --zeroconf-backend BACKEND
+                        Zeroconf (MDNS/DNS-SD) backend to use. Valid values
+                        are 'avahi', 'dns-sd' and 'libmdns', if librespot is
+                        compiled with the corresponding feature flags.
+    -l, --local-file-dir DIRECTORY
+                        Directory to search for local file playback. Can be
+                        specified multiple times to add multiple search
+                        directories
+

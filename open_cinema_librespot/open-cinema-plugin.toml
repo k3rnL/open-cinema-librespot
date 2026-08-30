@@ -1,0 +1,86 @@
+schema-version = 2
+permissions = [
+  { id = "audio.managed-source", reason = "Owns isolated librespot and PipeWire bridge processes for each configured Spotify Connect source." },
+  { id = "network.spotify", reason = "Connects to Spotify services and advertises Spotify Connect identities on configured local interfaces." },
+]
+
+[plugin]
+id = "open-cinema.librespot"
+distribution = "open-cinema-librespot"
+display-name = "Spotify Connect"
+description = "Creates one or more managed Spotify Connect inputs that Open Cinema can route like any other audio source."
+vendor = "Open Cinema"
+version = "0.1.0"
+license = "MIT"
+source-url = "https://github.com/k3rnL/open-cinema-librespot"
+documentation-url = "https://github.com/k3rnL/open-cinema-librespot#readme"
+
+[compatibility]
+open-cinema = ">=0.3.3,<0.4"
+python = ">=3.12,<3.14"
+operating-systems = ["linux"]
+architectures = ["x86_64", "aarch64", "arm64"]
+
+[compatibility.plugin-contract]
+minimum = 2
+maximum = 2
+[compatibility.capability-versions.api]
+minimum = 1
+maximum = 1
+[compatibility.capability-versions.automation]
+minimum = 1
+maximum = 1
+[compatibility.capability-versions.processing]
+minimum = 1
+maximum = 1
+[compatibility.capability-versions.managed-resource]
+minimum = 1
+maximum = 1
+[compatibility.capability-versions.managed-audio-source]
+minimum = 1
+maximum = 1
+[compatibility.capability-versions.admin-ui]
+minimum = 1
+maximum = 1
+
+[[capabilities]]
+id = "open-cinema.librespot.api"
+kind = "api"
+version = 1
+[[capabilities]]
+id = "open-cinema.librespot.automations"
+kind = "automation"
+version = 1
+[[capabilities]]
+id = "open-cinema.librespot.graph"
+kind = "processing"
+version = 1
+[[capabilities]]
+id = "open-cinema.librespot.resources"
+kind = "managed-resource"
+version = 1
+[[capabilities]]
+id = "open-cinema.librespot.sources"
+kind = "managed-audio-source"
+version = 1
+[[capabilities]]
+id = "open-cinema.librespot.admin"
+kind = "admin-ui"
+version = 1
+
+[[external-requirements]]
+id = "pipewire-pw-cat"
+description = "PipeWire pw-cat client used to publish the managed unlinked PCM stream."
+probe = "pw-cat --version"
+
+[configuration]
+version = 1
+schema = "schemas/plugin-settings-v1.json"
+migrations = []
+
+[lifecycle]
+install = "application-restart"
+enable = "hot"
+disable = "hot"
+update = "application-restart"
+uninstall = "application-restart"

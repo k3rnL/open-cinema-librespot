@@ -1,0 +1,12 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/librespot-org/librespot.git",
+  "tag": "v0.8.0",
+  "commit": "d36f9f1907e8cc9d68a93f8ebc6b627b1bf7267d",
+  "sourceDateEpoch": 1762793321,
+  "cargoLockSha256": "990c4df9e30c2e2637c6605cc00e5d421a16b17f0204d0de60fb19faf84cee00",
+  "rustToolchainFileSha256": "30fe72dae96289bf54b4b22f3131c464f6ea62a03568d277059262770d50baf3",
+  "rustToolchain": "1.85.0",
+  "features": ["rustls-tls-webpki-roots", "with-libmdns"],
+  "targets": ["x86_64-unknown-linux-gnu", "aarch64-unknown-linux-gnu"]
+}

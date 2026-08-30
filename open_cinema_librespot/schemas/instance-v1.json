@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://open-cinema.local/plugins/librespot/instance-v1.json",
+  "title": "Spotify Connect source instance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "name", "deviceType", "bitrate", "logLevel", "authentication", "discovery",
+    "volume", "normalisation", "playback", "cache", "localFileDirectories",
+    "automations", "activityHoldMs"
+  ],
+  "properties": {
+    "name": {"type": "string", "minLength": 1, "maxLength": 64},
+    "deviceType": {
+      "enum": [
+        "computer", "tablet", "smartphone", "speaker", "tv", "avr", "stb",
+        "audiodongle", "gameconsole", "castaudio", "castvideo", "automobile",
+        "smartwatch", "chromebook", "carthing"
+      ],
+      "default": "avr"
+    },
+    "group": {"type": "boolean", "default": false},
+    "bitrate": {"enum": [96, 160, 320], "default": 320},
+    "logLevel": {"enum": ["standard", "quiet", "verbose"], "default": "standard"},
+    "authentication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mode"],
+      "properties": {
+        "mode": {"enum": ["discovery", "access-token", "oauth-cache"], "default": "discovery"},
+        "username": {"type": ["string", "null"], "minLength": 1, "maxLength": 128, "default": null}
+      }
+    },
+    "proxy": {"type": ["string", "null"], "format": "uri", "maxLength": 2048, "default": null},
+    "apPort": {"type": ["integer", "null"], "minimum": 1, "maximum": 65535, "default": null},
+    "discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "backend", "port", "interfaces"],
+      "properties": {
+        "enabled": {"type": "boolean", "default": true},
+        "backend": {"enum": ["libmdns"], "default": "libmdns"},
+        "port": {"type": ["integer", "null"], "minimum": 1, "maximum": 65535, "default": null},
+        "interfaces": {
+          "type": "array", "maxItems": 16, "uniqueItems": true,
+          "items": {"type": "string", "format": "ip-address"}, "default": []
+        }
+      }
+    },
+    "volume": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["initialPercent", "control", "rangeDb", "steps"],
+      "properties": {
+        "initialPercent": {"type": "integer", "minimum": 0, "maximum": 100, "default": 50},
+        "control": {"enum": ["cubic", "fixed", "linear", "log"], "default": "log"},
+        "rangeDb": {"type": "number", "minimum": 0, "maximum": 100, "default": 60},
+        "steps": {"type": "integer", "minimum": 1, "maximum": 65535, "default": 64}
+      }
+    },
+    "normalisation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enabled", "method", "gainType", "pregainDb", "thresholdDbfs", "attackMs", "releaseMs", "kneeDb"],
+      "properties": {
+        "enabled": {"type": "boolean", "default": false},
+        "method": {"enum": ["basic", "dynamic"], "default": "dynamic"},
+        "gainType": {"enum": ["track", "album", "auto"], "default": "auto"},
+        "pregainDb": {"type": "number", "minimum": -10, "maximum": 10, "default": 0},
+        "thresholdDbfs": {"type": "number", "minimum": -10, "maximum": 0, "default": -2},
+        "attackMs": {"type": "integer", "minimum": 1, "maximum": 500, "default": 5},
+        "releaseMs": {"type": "integer", "minimum": 1, "maximum": 1000, "default": 100},
+        "kneeDb": {"type": "number", "minimum": 0, "maximum": 10, "default": 5}
+      }
+    },
+    "playback": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["autoplay", "gapless"],
+      "properties": {
+        "autoplay": {"enum": ["client", "on", "off"], "default": "client"},
+        "gapless": {"type": "boolean", "default": true}
+      }
+    },
+    "cache": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["audioEnabled", "credentialsEnabled", "sizeLimit"],
+      "properties": {
+        "audioEnabled": {"type": "boolean", "default": true},
+        "credentialsEnabled": {"type": "boolean", "default": true},
+        "sizeLimit": {"type": ["string", "null"], "pattern": "^[1-9][0-9]*[KMG]?$", "maxLength": 16, "default": "2G"}
+      }
+    },
+    "localFileDirectories": {
+      "type": "array", "maxItems": 32, "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 1024}, "default": []
+    },
+    "automations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["eventIds", "includeSinkEvents"],
+      "properties": {
+        "eventIds": {
+          "type": "array", "maxItems": 32, "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$"}, "default": []
+        },
+        "includeSinkEvents": {"type": "boolean", "default": true}
+      }
+    },
+    "activityHoldMs": {"type": "integer", "minimum": 0, "maximum": 30000, "default": 1500}
+  }
+}
+
