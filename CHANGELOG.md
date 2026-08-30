@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.9 - 2026-08-30
+
+- Resolve the librespot event relay from immutable plugin overlay generations as
+  well as conventional virtual-environment installations.
+
 ## 0.1.8 - 2026-08-30
 
 - Initialize the Django host before importing SDK-backed plugin storage in the

@@ -96,7 +96,13 @@ class LibrespotProvider:
             raise RuntimeError("Open Cinema host services are unavailable")
         # Keep the virtual-environment path. Resolving the Python symlink would jump
         # to /usr/bin and lose the console scripts installed beside the interpreter.
-        event_relay = Path(sys.executable).parent / "open-cinema-librespot-event-relay"
+        interpreter_relay = Path(sys.executable).parent / "open-cinema-librespot-event-relay"
+        overlay_relay = (
+            Path(__file__).resolve().parent.parent
+            / "bin"
+            / "open-cinema-librespot-event-relay"
+        )
+        event_relay = overlay_relay if overlay_relay.is_file() else interpreter_relay
         socket_id = uuid.uuid5(
             uuid.NAMESPACE_URL,
             f"{context.plugin_id}:{context.instance_id}",

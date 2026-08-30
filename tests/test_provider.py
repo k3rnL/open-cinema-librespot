@@ -200,6 +200,42 @@ def test_event_relay_is_resolved_beside_the_runtime_interpreter(
     assert paths.event_relay == relay
 
 
+def test_event_relay_is_resolved_inside_an_immutable_plugin_overlay(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    runtime_bin = tmp_path / "venv" / "bin"
+    runtime_bin.mkdir(parents=True)
+    interpreter = runtime_bin / "python"
+    interpreter.symlink_to("/usr/bin/python3")
+    overlay_package = tmp_path / "generation" / "site-packages" / "open_cinema_librespot"
+    overlay_package.mkdir(parents=True)
+    overlay_relay = overlay_package.parent / "bin" / "open-cinema-librespot-event-relay"
+    overlay_relay.parent.mkdir()
+    overlay_relay.touch()
+    monkeypatch.setattr("open_cinema_librespot.provider.sys.executable", str(interpreter))
+    monkeypatch.setattr(
+        "open_cinema_librespot.provider.__file__",
+        str(overlay_package / "provider.py"),
+    )
+
+    class Services:
+        def private_directory(self, purpose):
+            directory = tmp_path / "private" / purpose
+            directory.mkdir(parents=True, exist_ok=True)
+            return str(directory)
+
+    context = SimpleNamespace(
+        plugin_id="open-cinema.librespot",
+        instance_id="overlay-relay-source",
+        host_services=Services(),
+    )
+
+    paths = LibrespotProvider._paths(context)
+
+    assert paths.event_relay == overlay_relay
+
+
 def test_event_socket_stays_below_the_linux_unix_path_limit(
     monkeypatch,
     tmp_path: Path,
