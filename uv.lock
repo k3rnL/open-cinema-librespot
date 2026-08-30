@@ -743,17 +743,17 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "open-cinema-librespot"
-version = "0.1.5"
+version = "0.1.6"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
-    { name = "open-cinema" },
 ]
 
 [package.dev-dependencies]
 dev = [
     { name = "build" },
     { name = "mypy" },
+    { name = "open-cinema" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "pytest-django" },
@@ -763,15 +763,13 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "jsonschema", specifier = ">=4.25" },
-    { name = "open-cinema", editable = "../open-cinema" },
-]
+requires-dist = [{ name = "jsonschema", specifier = ">=4.25" }]
 
 [package.metadata.requires-dev]
 dev = [
     { name = "build", specifier = ">=1.2.2" },
     { name = "mypy", specifier = ">=1.15" },
+    { name = "open-cinema", editable = "../open-cinema" },
     { name = "pytest", specifier = ">=8.3" },
     { name = "pytest-cov", specifier = ">=6.0" },
     { name = "pytest-django", specifier = ">=4.11" },

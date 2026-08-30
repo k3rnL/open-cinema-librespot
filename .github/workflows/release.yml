@@ -160,14 +160,11 @@ jobs:
           uv pip install --python .release-smoke/bin/python build setuptools wheel
           .release-smoke/bin/python -m build \
             --wheel --no-isolation --outdir host-dist open-cinema
-          uv pip install --python .release-smoke/bin/python --no-deps \
+          uv pip install --python .release-smoke/bin/python \
+            wyreplumber-release/*.whl
+          uv pip install --python .release-smoke/bin/python \
             host-dist/open_cinema-*.whl \
             downloaded/*linux_${ARCHITECTURE}.whl
-          uv pip install --python .release-smoke/bin/python \
-            wyreplumber-release/*.whl \
-            'Django>=6.0' \
-            'jsonschema>=4.25' \
-            'packaging>=24.0'
           .release-smoke/bin/python scripts/verify_release_install.py \
             --wheel downloaded/*linux_${ARCHITECTURE}.whl \
             --checksum "downloaded/checksums-${ARCHITECTURE}.sha256" \

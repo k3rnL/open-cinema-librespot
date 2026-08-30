@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.6 - 2026-08-30
+
+- Keep Open Cinema host compatibility in the plugin manifest instead of wheel
+  runtime dependencies, allowing the marketplace overlay to resolve only
+  plugin-owned dependencies.
+- Install the complete clean Open Cinema host dependency set in release smoke
+  fixtures before validating downloaded plugin wheels.
+
 ## 0.1.5 - 2026-08-30
 
 - Correct the immutable release asset selector so both architecture provenance

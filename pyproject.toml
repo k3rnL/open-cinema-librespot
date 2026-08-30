@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "open-cinema-librespot"
-version = "0.1.5"
+version = "0.1.6"
 description = "Managed Spotify Connect audio sources for Open Cinema"
 readme = "README.md"
 requires-python = ">=3.12,<3.14"
@@ -20,7 +20,7 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Topic :: Multimedia :: Sound/Audio",
 ]
-dependencies = ["jsonschema>=4.25", "open-cinema>=0.3.3,<0.4"]
+dependencies = ["jsonschema>=4.25"]
 
 [project.urls]
 Homepage = "https://github.com/k3rnL/open-cinema-librespot"
@@ -38,6 +38,7 @@ open-cinema-librespot-event-relay = "open_cinema_librespot.events:relay_main"
 dev = [
   "build>=1.2.2",
   "mypy>=1.15",
+  "open-cinema>=0.3.3,<0.4",
   "pytest>=8.3",
   "pytest-cov>=6.0",
   "pytest-django>=4.11",

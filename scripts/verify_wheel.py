@@ -6,7 +6,10 @@ import hashlib
 import json
 import platform
 import zipfile
+from email.parser import Parser
 from pathlib import Path
+
+from packaging.requirements import Requirement
 
 
 def main() -> int:
@@ -29,6 +32,19 @@ def main() -> int:
         missing = sorted(required - names)
         if missing:
             raise SystemExit(f"wheel is incomplete: {missing}")
+        metadata_files = [name for name in names if name.endswith(".dist-info/METADATA")]
+        if len(metadata_files) != 1:
+            raise SystemExit("wheel must contain exactly one METADATA file")
+        metadata = Parser().parsestr(archive.read(metadata_files[0]).decode("utf-8"))
+        dependencies = {
+            Requirement(value).name.lower().replace("_", "-")
+            for value in metadata.get_all("Requires-Dist", ())
+        }
+        if "open-cinema" in dependencies:
+            raise SystemExit(
+                "Open Cinema host compatibility belongs in the plugin manifest, "
+                "not wheel runtime dependencies"
+            )
         identity = json.loads(archive.read(prefix + "identity.json"))
         for filename, field in (
             ("librespot", "librespotSha256"),
