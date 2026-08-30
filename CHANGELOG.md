@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 - Unreleased
+## 0.1.0 - 2026-08-30
 
 - Initial external Open Cinema Spotify Connect source plugin.
 - Multi-instance managed librespot and PipeWire bridge contract.
