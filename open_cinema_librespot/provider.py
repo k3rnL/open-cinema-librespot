@@ -22,7 +22,7 @@ from open_cinema_plugin_sdk import (
 )
 
 from .events import playback_event_name
-from .options import InstancePaths, build_launch_plan
+from .options import InstancePaths, build_launch_plan, detect_pw_cat_raw_mode
 from .runtime_assets import RuntimeAssetError, load_runtime_assets
 from .supervision import SupervisorObservation, SupervisorRegistry
 
@@ -277,6 +277,7 @@ class LibrespotProvider:
                     "librespotVersion": assets.metadata["librespotVersion"],
                     "librespotBinary": str(assets.librespot),
                     "pwCatBinary": pw_cat,
+                    "pwCatRawMode": detect_pw_cat_raw_mode(pw_cat),
                 },
             )
         except (OSError, RuntimeAssetError, RuntimeError) as error:
@@ -329,6 +330,7 @@ class LibrespotProvider:
             configuration=context.configuration,
             paths=paths,
             access_token=token,
+            pw_cat_raw_mode=bool(prepared.facts["pwCatRawMode"]),
         )
         self.supervisors.get(context.instance_id).start(
             plan, generation=generation, event_socket=paths.event_socket

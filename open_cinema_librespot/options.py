@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from collections.abc import Mapping
 from dataclasses import dataclass
 from importlib import resources
@@ -50,6 +51,23 @@ def option_contract() -> dict[str, Any]:
     return value
 
 
+def detect_pw_cat_raw_mode(pw_cat_binary: str | Path) -> bool:
+    try:
+        completed = subprocess.run(
+            [str(Path(pw_cat_binary)), "--help"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=5,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise RuntimeError(f"could not inspect pw-cat capabilities: {error}") from error
+    help_output = completed.stdout + completed.stderr
+    if completed.returncode != 0 or "--playback" not in help_output:
+        raise RuntimeError("pw-cat did not return a recognizable capability summary")
+    return "--raw" in help_output
+
+
 def _append_option(argv: list[str], name: str, value: Any) -> None:
     if value is None:
         return
@@ -67,6 +85,7 @@ def build_launch_plan(
     access_token: str | None = None,
     media_roots: tuple[str | Path, ...] = (),
     latency: str = "10ms",
+    pw_cat_raw_mode: bool = False,
 ) -> LaunchPlan:
     config = validate_instance_configuration(configuration, media_roots=media_roots)
     paths.ensure_private()
@@ -174,26 +193,32 @@ def build_launch_plan(
         "open-cinema.generation": generation,
     }
     property_argument = " ".join(f"{key}={json.dumps(value)}" for key, value in properties.items())
-    bridge = (
+    bridge = [
         str(Path(pw_cat_binary)),
         "--playback",
-        "--target",
-        "0",
-        "--latency",
-        latency,
-        "--rate",
-        "44100",
-        "--channels",
-        "2",
-        "--channel-map",
-        "stereo",
-        "--format",
-        "f32",
-        "--media-role",
-        "Music",
-        "--properties",
-        property_argument,
-        "-",
+    ]
+    if pw_cat_raw_mode:
+        bridge.append("--raw")
+    bridge.extend(
+        (
+            "--target",
+            "0",
+            "--latency",
+            latency,
+            "--rate",
+            "44100",
+            "--channels",
+            "2",
+            "--channel-map",
+            "stereo",
+            "--format",
+            "f32",
+            "--media-role",
+            "Music",
+            "--properties",
+            property_argument,
+            "-",
+        )
     )
     environment = {
         "OPEN_CINEMA_LIBRESPOT_INSTANCE_ID": instance_id,
@@ -206,4 +231,4 @@ def build_launch_plan(
         key: "<redacted>" if key == "LIBRESPOT_ACCESS_TOKEN" else value
         for key, value in environment.items()
     }
-    return LaunchPlan(tuple(argv), bridge, environment, redacted, properties)
+    return LaunchPlan(tuple(argv), tuple(bridge), environment, redacted, properties)

@@ -10,7 +10,11 @@ from pathlib import Path
 import pytest
 
 from open_cinema_librespot.configuration import default_instance_configuration
-from open_cinema_librespot.options import InstancePaths, build_launch_plan
+from open_cinema_librespot.options import (
+    InstancePaths,
+    build_launch_plan,
+    detect_pw_cat_raw_mode,
+)
 from open_cinema_librespot.supervision import ResourceSupervisor
 
 pytestmark = pytest.mark.pipewire_integration
@@ -81,6 +85,7 @@ def test_real_bridge_is_unlinked_correlated_and_removed(tmp_path: Path) -> None:
         generation="integration-generation",
         configuration=default_instance_configuration(name="Integration source"),
         paths=paths,
+        pw_cat_raw_mode=detect_pw_cat_raw_mode(pw_cat),
     )
     supervisor = ResourceSupervisor(stop_timeout_seconds=1)
 

@@ -5,7 +5,12 @@ from pathlib import Path
 import pytest
 
 from open_cinema_librespot.configuration import default_instance_configuration
-from open_cinema_librespot.options import InstancePaths, build_launch_plan, option_contract
+from open_cinema_librespot.options import (
+    InstancePaths,
+    build_launch_plan,
+    detect_pw_cat_raw_mode,
+    option_contract,
+)
 
 
 def paths(tmp_path: Path) -> InstancePaths:
@@ -46,6 +51,7 @@ def test_launch_plan_has_fixed_pcm_boundary_and_no_secret_in_argv(tmp_path: Path
         configuration=config,
         paths=paths(tmp_path),
         access_token="very-secret-token",
+        pw_cat_raw_mode=True,
     )
 
     argv = list(plan.librespot_argv)
@@ -57,6 +63,7 @@ def test_launch_plan_has_fixed_pcm_boundary_and_no_secret_in_argv(tmp_path: Path
     assert plan.environment["LIBRESPOT_ACCESS_TOKEN"] == "very-secret-token"
     assert plan.redacted_environment["LIBRESPOT_ACCESS_TOKEN"] == "<redacted>"
     assert plan.bridge_argv[-1] == "-"
+    assert "--raw" in plan.bridge_argv
     assert plan.bridge_argv[plan.bridge_argv.index("--target") + 1] == "0"
     assert plan.bridge_argv[plan.bridge_argv.index("--rate") + 1] == "44100"
     assert plan.pipewire_properties["node.autoconnect"] == "false"
@@ -74,6 +81,18 @@ def test_launch_plan_has_fixed_pcm_boundary_and_no_secret_in_argv(tmp_path: Path
         access_token="very-secret-token",
     )
     assert "--emit-sink-events" not in without_sink_events.librespot_argv
+
+
+def test_pw_cat_raw_mode_is_enabled_only_when_supported(tmp_path: Path) -> None:
+    modern = tmp_path / "pw-cat-modern"
+    modern.write_text("#!/bin/sh\necho '  -a, --raw  RAW mode'\necho '  -p, --playback'\n")
+    modern.chmod(0o700)
+    legacy = tmp_path / "pw-cat-legacy"
+    legacy.write_text("#!/bin/sh\necho '  -p, --playback  Playback mode'\n")
+    legacy.chmod(0o700)
+
+    assert detect_pw_cat_raw_mode(modern) is True
+    assert detect_pw_cat_raw_mode(legacy) is False
 
 
 def test_all_typed_values_serialize_deterministically(tmp_path: Path) -> None:
