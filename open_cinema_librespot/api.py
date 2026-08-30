@@ -26,6 +26,7 @@ from .configuration import (
 from .oauth import OAuthOperations, oauth_refresh_secret_id
 from .options import option_contract
 from .provider import access_token_secret_id
+from .version import __version__
 
 PLUGIN_ID = "open-cinema.librespot"
 CAPABILITY_ID = "open-cinema.librespot.sources"
@@ -292,7 +293,7 @@ class LibrespotAPI:
                     "value": "Ready to route" if route_available else "Unavailable",
                 },
                 {"label": "Librespot", "value": facts.get("librespotVersion", "not observed")},
-                {"label": "Plugin", "value": facts.get("pluginVersion", "0.1.0")},
+                {"label": "Plugin", "value": facts.get("pluginVersion", __version__)},
             ],
             "diagnostics": diagnostics,
             "graphReferences": list(references),

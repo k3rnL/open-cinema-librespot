@@ -24,7 +24,7 @@ contract host and the generic admin renderer.
   `3b150a07b173c8d1dfa265bb6fb7735b6c1aea59deb9f8a3f66933fec861cac2`.
 - The final wheel was tagged `py3-none-linux_x86_64`, contained both verified native
   executables and their identity document, and passed the wheel verifier.
-- A clean-wheel smoke environment reported plugin `0.1.0`, six capabilities, and
+- A clean-wheel smoke environment reported plugin `0.1.1`, six capabilities, and
   librespot `0.8.0`.
 - The local API, orchestrator, Redis, and Vite admin were started together; runtime
   readiness was green and the declarative Spotify Connect page and managed source

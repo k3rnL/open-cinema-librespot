@@ -17,7 +17,7 @@ def test_release_provenance_matches_source_runtime_and_option_contract() -> None
         architecture="x86_64",
         repository="k3rnL/open-cinema-librespot",
         commit="0" * 40,
-        tag="v0.1.0",
+        tag="v0.1.1",
         workflow_run="https://example.invalid/actions/runs/test",
         root=ROOT,
     )
@@ -28,7 +28,7 @@ def test_release_provenance_matches_source_runtime_and_option_contract() -> None
     )
     option_raw = (ROOT / "option-contract/librespot-v0.8.0.json").read_bytes()
 
-    assert document["pluginVersion"] == "0.1.0"
+    assert document["pluginVersion"] == "0.1.1"
     assert document["runtimeIdentity"] == identity
     assert document["optionContract"] == option_contract_summary(json.loads(option_raw), option_raw)
 
@@ -46,7 +46,7 @@ def test_release_provenance_rejects_a_tag_version_mismatch() -> None:
 
 
 def test_downloaded_checksum_uses_the_wheel_basename(tmp_path: Path) -> None:
-    wheel = tmp_path / "open_cinema_librespot-0.1.0-py3-none-linux_x86_64.whl"
+    wheel = tmp_path / "open_cinema_librespot-0.1.1-py3-none-linux_x86_64.whl"
     wheel.write_bytes(b"release-wheel")
     digest = hashlib.sha256(wheel.read_bytes()).hexdigest()
     checksum = tmp_path / "checksums-x86_64.sha256"
