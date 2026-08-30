@@ -38,7 +38,7 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends \
-            ca-certificates curl gcc git pkg-config
+            build-essential ca-certificates curl git pkg-config
       - uses: astral-sh/setup-uv@v4
       - uses: dtolnay/rust-toolchain@master
         with:
