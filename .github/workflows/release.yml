@@ -99,7 +99,7 @@ jobs:
           files: |
             release/*.whl
             release/*.sha256
-            release/*provenance.json
+            release/provenance-*.json
 
   smoke-release:
     name: Smoke downloaded ${{ matrix.architecture }} release

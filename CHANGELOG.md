@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.5 - 2026-08-30
+
+- Correct the immutable release asset selector so both architecture provenance
+  documents are published and smoke-tested with the wheels.
+
 ## 0.1.4 - 2026-08-30
 
 - Preserve Git safe-directory trust across checkout and build-container home changes.

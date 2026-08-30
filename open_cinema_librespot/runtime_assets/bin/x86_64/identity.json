@@ -9,7 +9,7 @@
   "librespotVersion": "0.8.0",
   "librespotVersionOutput": "librespot 0.8.0 d36f9f1 (Built on 2025-11-10, Build ID: 1762793321, Profile: release)",
   "oauthHelperSha256": "449fa4db60edcbc0e34b99e8cab1ef04fae956f328cf54da297c9c09daee87a4",
-  "pluginVersion": "0.1.4",
+  "pluginVersion": "0.1.5",
   "schemaVersion": 1,
   "sourceDateEpoch": 1762793321,
   "target": "x86_64-unknown-linux-gnu"
