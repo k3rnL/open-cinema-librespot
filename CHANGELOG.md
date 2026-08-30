@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.10 - 2026-08-30
+
+- Preserve the immutable plugin overlay import path for the librespot event
+  relay, so playback events remain available after installation.
+
 ## 0.1.9 - 2026-08-30
 
 - Resolve the librespot event relay from immutable plugin overlay generations as

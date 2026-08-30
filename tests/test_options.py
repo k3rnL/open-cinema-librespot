@@ -83,6 +83,31 @@ def test_launch_plan_has_fixed_pcm_boundary_and_no_secret_in_argv(tmp_path: Path
     assert "--emit-sink-events" not in without_sink_events.librespot_argv
 
 
+def test_overlay_event_relay_receives_its_immutable_python_path(tmp_path: Path) -> None:
+    instance_paths = paths(tmp_path)
+    overlay = tmp_path / "generation" / "site-packages"
+    instance_paths = InstancePaths(
+        instance_paths.temporary,
+        instance_paths.audio_cache,
+        instance_paths.system_cache,
+        instance_paths.event_relay,
+        instance_paths.event_socket,
+        overlay,
+    )
+
+    plan = build_launch_plan(
+        librespot_binary="/verified/librespot",
+        pw_cat_binary="/usr/bin/pw-cat",
+        instance_id="source-1",
+        generation="generation-1",
+        configuration=default_instance_configuration(),
+        paths=instance_paths,
+    )
+
+    assert plan.environment["PYTHONPATH"] == str(overlay)
+    assert plan.redacted_environment["PYTHONPATH"] == str(overlay)
+
+
 def test_pw_cat_raw_mode_is_enabled_only_when_supported(tmp_path: Path) -> None:
     modern = tmp_path / "pw-cat-modern"
     modern.write_text("#!/bin/sh\necho '  -a, --raw  RAW mode'\necho '  -p, --playback'\n")

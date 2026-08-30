@@ -100,6 +100,7 @@ class LibrespotProvider:
         overlay_relay = (
             Path(__file__).resolve().parent.parent / "bin" / "open-cinema-librespot-event-relay"
         )
+        overlay_python_path = Path(__file__).resolve().parent.parent
         event_relay = overlay_relay if overlay_relay.is_file() else interpreter_relay
         socket_id = uuid.uuid5(
             uuid.NAMESPACE_URL,
@@ -122,6 +123,7 @@ class LibrespotProvider:
             Path(services.private_directory("system-cache")),
             event_relay,
             event_socket,
+            overlay_python_path if overlay_relay.is_file() else None,
         )
 
     @staticmethod

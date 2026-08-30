@@ -198,6 +198,7 @@ def test_event_relay_is_resolved_beside_the_runtime_interpreter(
     paths = LibrespotProvider._paths(context)
 
     assert paths.event_relay == relay
+    assert paths.event_python_path is None
 
 
 def test_event_relay_is_resolved_inside_an_immutable_plugin_overlay(
@@ -234,6 +235,7 @@ def test_event_relay_is_resolved_inside_an_immutable_plugin_overlay(
     paths = LibrespotProvider._paths(context)
 
     assert paths.event_relay == overlay_relay
+    assert paths.event_python_path == overlay_package.parent
 
 
 def test_event_socket_stays_below_the_linux_unix_path_limit(

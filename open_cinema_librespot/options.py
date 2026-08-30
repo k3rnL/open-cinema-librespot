@@ -18,6 +18,7 @@ class InstancePaths:
     system_cache: Path
     event_relay: Path
     event_socket: Path
+    event_python_path: Path | None = None
 
     def ensure_private(self) -> None:
         for directory in (self.temporary, self.audio_cache, self.system_cache):
@@ -225,6 +226,8 @@ def build_launch_plan(
         "OPEN_CINEMA_LIBRESPOT_GENERATION": generation,
         "OPEN_CINEMA_LIBRESPOT_EVENT_SOCKET": str(paths.event_socket),
     }
+    if paths.event_python_path is not None:
+        environment["PYTHONPATH"] = str(paths.event_python_path)
     if access_token is not None:
         environment["LIBRESPOT_ACCESS_TOKEN"] = access_token
     redacted = {
