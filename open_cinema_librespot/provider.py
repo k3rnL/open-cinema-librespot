@@ -98,9 +98,7 @@ class LibrespotProvider:
         # to /usr/bin and lose the console scripts installed beside the interpreter.
         interpreter_relay = Path(sys.executable).parent / "open-cinema-librespot-event-relay"
         overlay_relay = (
-            Path(__file__).resolve().parent.parent
-            / "bin"
-            / "open-cinema-librespot-event-relay"
+            Path(__file__).resolve().parent.parent / "bin" / "open-cinema-librespot-event-relay"
         )
         event_relay = overlay_relay if overlay_relay.is_file() else interpreter_relay
         socket_id = uuid.uuid5(
