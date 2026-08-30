@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7 - 2026-08-30
+
+- Complete the clean release-smoke host fixture with the host's public runtime
+  dependencies while keeping native deployment-only artifacts explicit.
+
 ## 0.1.6 - 2026-08-30
 
 - Keep Open Cinema host compatibility in the plugin manifest instead of wheel
