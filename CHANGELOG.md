@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.3 - 2026-08-30
+
+- Make release-build Git checks use the explicit Actions workspace inside build containers.
+
 ## 0.1.2 - 2026-08-30
 
 - Correct the source-tree version lookup used by dependency-free ARM64 asset builds.

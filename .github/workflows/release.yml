@@ -48,9 +48,10 @@ jobs:
         env:
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
-          git diff --exit-code
-          git diff --cached --exit-code
-          test "$(git rev-list -n 1 "$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          test -d "$GITHUB_WORKSPACE/.git"
+          test -z "$(git -C "$GITHUB_WORKSPACE" status --porcelain)"
+          test "$(git -C "$GITHUB_WORKSPACE" rev-list -n 1 "$GITHUB_REF_NAME")" = "$GITHUB_SHA"
+          cd "$GITHUB_WORKSPACE"
           version="$(python -c 'from pathlib import Path; import re; print(re.search(r"__version__ = \"([^\"]+)", Path("open_cinema_librespot/version.py").read_text()).group(1))')"
           test "v$version" = "$GITHUB_REF_NAME"
           uv venv
