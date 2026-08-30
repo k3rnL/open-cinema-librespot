@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4 - 2026-08-30
+
+- Preserve Git safe-directory trust across checkout and build-container home changes.
+
 ## 0.1.3 - 2026-08-30
 
 - Make release-build Git checks use the explicit Actions workspace inside build containers.

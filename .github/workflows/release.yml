@@ -49,6 +49,7 @@ jobs:
           ARCHITECTURE: ${{ matrix.architecture }}
         run: |
           test -d "$GITHUB_WORKSPACE/.git"
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           test -z "$(git -C "$GITHUB_WORKSPACE" status --porcelain)"
           test "$(git -C "$GITHUB_WORKSPACE" rev-list -n 1 "$GITHUB_REF_NAME")" = "$GITHUB_SHA"
           cd "$GITHUB_WORKSPACE"
