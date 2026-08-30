@@ -743,7 +743,7 @@ provides-extras = ["dev"]
 
 [[package]]
 name = "open-cinema-librespot"
-version = "0.1.8"
+version = "0.1.9"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
