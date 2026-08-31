@@ -137,7 +137,11 @@ class LibrespotProvider:
             "paused": "paused",
             "stopped": "stopped",
             "loading": "loading",
-            "preloading": "loading",
+            # Librespot emits this while the current programme is still playing,
+            # normally well before the next track starts. Treating it as loading
+            # unlinks the pipe-backed source and can prevent the next track from
+            # ever reaching the playing state.
+            "preloading": "playing",
             "end_of_track": "stopped",
             "unavailable": "error",
             "sink:running": "playing",

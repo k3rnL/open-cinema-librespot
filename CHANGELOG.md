@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.11 - 2026-08-31
+
+- Keep the current programme active when librespot preloads the next track, so
+  activity-based graphs do not unlink the PipeWire bridge and fall back between
+  consecutive tracks.
+
 ## 0.1.10 - 2026-08-30
 
 - Preserve the immutable plugin overlay import path for the librespot event

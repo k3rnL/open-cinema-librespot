@@ -83,6 +83,25 @@ def test_running_sink_event_is_active_playback() -> None:
     }
 
 
+def test_preloading_keeps_current_programme_active() -> None:
+    provider = LibrespotProvider()
+    preload = {
+        "event": "preloading",
+        # Keep this outside the activity hold to prove preloading itself stays
+        # active rather than passing through the generic transition hold.
+        "observedAtUnixMs": int(time.time() * 1000) - 30_000,
+    }
+
+    facts = provider._playback_facts(supervisor_observation(event=preload), 500)
+
+    assert facts == {
+        "playbackState": "playing",
+        "activeSignal": True,
+        "activityHeld": False,
+        "lastPlaybackEvent": "preloading",
+    }
+
+
 def test_volume_event_does_not_replace_playing_state() -> None:
     provider = LibrespotProvider()
     playing = {
